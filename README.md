@@ -1,35 +1,51 @@
 # cloudeye-exporter
 
-Prometheus cloudeye exporter for [Huaweicloud](https://www.huaweicloud.com/).
+Prometheus cloudeye exporter for cloudru-advanced.
 
-[中文](./README_cn.md)
+## Introduce
 
-## Download
+Prometheus is an open source visualization tool used to display large-scale measurement data. It also has a broad user base in fields such as industrial monitoring, weather monitoring, home automation, and process management. After connecting the Sbercloud Cloudeye service to prometheus, you can use prometheus to better monitor and analyze data from the Cloudeye service.
+
+
+## Install and configure cloudeye-exporter
+
+1. Install cloudeye-exporter
 ```
-$ git clone https://github.com/huaweicloud/cloudeye-exporter
+git clone https://github.com/sbercloud-terraform/cloudeye-exporter
+cd cloudeye-exporter
+```
+2. Configure clouds.yml file
+```
+global:
+  prefix: "sbercloud"
+  port: ":8087"
+  metric_path: "/metrics"
+  scrape_batch_size: 10
+auth:
+  auth_url: "https://iam.ru-moscow-1.hc.sbercloud.ru/v3"
+  project_name: "{project_name}"
+  access_key: "{access_key}"
+  secret_key: "{secret_key}"
+  region: "ru-moscow-1"
+```
+or
+```
+auth:
+  auth_url: "https://iam.ru-moscow-1.hc.sbercloud.ru/v3"
+  project_name: "{project_name}"
+  user_name: "{username}"
+  password: "{password}"
+  region: "ru-moscow-1"
+  domain_name: "{domain_name}"
+
 ```
 
-## (Option) Building The Discovery with Exact steps on clean Ubuntu 16.04 
+3. Start cloudeye-exporter
 ```
-$ wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
-$ sudo tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
-$ export PATH=$PATH:/usr/local/go/bin # You should put in your .profile or .bashrc
-$ go version # to verify it runs and version #
-
-$ go get github.com/huaweicloud/cloudeye-exporter
-$ cd ~/go/src/github.com/huaweicloud/cloudeye-exporter
-$ go build
+./cloudeye-exporter
 ```
-
-## Usage
-```
- ./cloudeye-exporter  -config=clouds.yml
-```
-
-The default port is 8087, default config file location is ./clouds.yml.
 
 Visit metrics in http://localhost:8087/metrics?services=SYS.VPC,SYS.ELB
-
 
 ## Help
 ```
@@ -40,49 +56,32 @@ Usage of ./cloudeye-exporter:
         If debug the code.
  
 ```
+The default port is 8087, default config file location is ./clouds.yml.
 
-## Example of config file(clouds.yml)
-The "URL" value can be get from [Identity and Access Management (IAM) endpoint list](https://developer.huaweicloud.com/en-us/endpoint).
+## Install and configure prometheus to connect to cloudeye
+1. Download Prometheus (https://prometheus.io/download/)
 ```
-global:
-  prefix: "huaweicloud"
-  port: ":8087"
-  metric_path: "/metrics"
-  scrape_batch_size: 10
-auth:
-  auth_url: "https://iam.xxx.yyy.com/v3"
-  project_name: "{project_name}"
-  access_key: "{access_key}"
-  secret_key: "{secret_key}"
-  region: "{region}"
-
+$ wget https://github.com/prometheus/prometheus/releases/download/v2.14.0/prometheus-2.14.0.linux-amd64.tar.gz 
+$ tar xzf prometheus-2.14.0.linux-amd64.tar.gz
+$ cd prometheus-2.14.0.linux-amd64
 ```
-or
+2. Configure access to cloudeye exporter node
 
-```
-auth:
-  auth_url: "https://iam.xxx.yyy.com/v3"
-  project_name: "{project_name}"
-  user_name: "{username}"
-  password: "{password}"
-  region: "{region}"
-  domain_name: "{domain_name}"
-
-```
-
-## Prometheus Configuration
-The huaweicloud exporter needs to be passed the address as a parameter, this can be done with relabelling.
-
-Example config:
-
+   Modify the prometheus.yml file configuration in prometheus. As shown in the following configuration, add a node with job_name named 'sbercloud' under scrape_configs. Among them, targets are configured with the IP address and port number for accessing the cloudeye-exporter service, and services are configured with the services you want to monitor, such as SYS.VPC and SYS.RDS.
 ```
 global:
   scrape_interval: 1m # Set the scrape interval to every 1 minute seconds. Default is every 1 minute.
   scrape_timeout: 1m
 scrape_configs:
-  - job_name: 'huaweicloud'
+  - job_name: 'sbercloud'
     static_configs:
     - targets: ['10.0.0.10:8087']
     params:
       services: ['SYS.VPC,SYS.ELB']
 ```
+3. Start prometheus to monitor cloudru-advanced services
+```
+./prometheus
+```
+* Log in to http://127.0.0.1:9090/graph
+* View the monitoring results of specified indicators

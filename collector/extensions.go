@@ -32,6 +32,7 @@ var defaultExtensionLabels = map[string][]string{
 	"sys_ecs":                 []string{"hostname"},
 	"sys_as":                  []string{"name", "status"},
 	"sys_functiongraph":       []string{"func_urn"},
+	"sys_obs":                 []string{"name", "engine_version", "resource_spec_code", "connect_address", "port"},
 }
 
 const TTL = time.Hour * 3
@@ -47,6 +48,7 @@ var (
 	ecsInfo serversInfo
 	asInfo  serversInfo
 	fgsInfo serversInfo
+	obsInfo serversInfo
 )
 
 type serversInfo struct {
@@ -74,7 +76,7 @@ func buildSingleDimensionMetrics(metricNames []string, namespace, dimName, dimVa
 	return filterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getElbResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getElbResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	elbInfo.Lock()
@@ -168,7 +170,7 @@ func buildPoolMetrics(metricNames []string, elb *loadbalancers.LoadBalancer) []m
 	return filterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getNatResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getNatResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	natInfo.Lock()
@@ -200,7 +202,7 @@ func (exporter *BaseHuaweiCloudExporter) getNatResourceInfo() (map[string][]stri
 	return natInfo.Info, &natInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getRdsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getRdsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	rdsInfo.Lock()
@@ -244,7 +246,7 @@ func (exporter *BaseHuaweiCloudExporter) getRdsResourceInfo() (map[string][]stri
 	return rdsInfo.Info, &rdsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getDmsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getDmsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	dmsInfo.Lock()
 	defer dmsInfo.Unlock()
@@ -279,7 +281,7 @@ func (exporter *BaseHuaweiCloudExporter) getDmsResourceInfo() (map[string][]stri
 	return dmsInfo.Info, &dmsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getDcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getDcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	dcsInfo.Lock()
@@ -318,7 +320,7 @@ func (exporter *BaseHuaweiCloudExporter) getDcsResourceInfo() (map[string][]stri
 	return dcsInfo.Info, &dcsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getVpcResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getVpcResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	vpcInfo.Lock()
 	defer vpcInfo.Unlock()
@@ -350,7 +352,7 @@ func (exporter *BaseHuaweiCloudExporter) getVpcResourceInfo() (map[string][]stri
 	return vpcInfo.Info, &vpcInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getEvsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getEvsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	evsInfo.Lock()
 	defer evsInfo.Unlock()
@@ -377,7 +379,7 @@ func (exporter *BaseHuaweiCloudExporter) getEvsResourceInfo() (map[string][]stri
 	return evsInfo.Info, &evsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getEcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getEcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	ecsInfo.Lock()
 	defer ecsInfo.Unlock()
@@ -401,7 +403,7 @@ func (exporter *BaseHuaweiCloudExporter) getEcsResourceInfo() (map[string][]stri
 	return ecsInfo.Info, &ecsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getAsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getAsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	asInfo.Lock()
 	defer asInfo.Unlock()
@@ -425,7 +427,7 @@ func (exporter *BaseHuaweiCloudExporter) getAsResourceInfo() (map[string][]strin
 	return asInfo.Info, &asInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getFunctionGraphResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getFunctionGraphResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	fgsInfo.Lock()
 	defer fgsInfo.Unlock()
@@ -449,7 +451,29 @@ func (exporter *BaseHuaweiCloudExporter) getFunctionGraphResourceInfo() (map[str
 	return fgsInfo.Info, &fgsInfo.FilterMetrics
 }
 
-func (exporter *BaseHuaweiCloudExporter) getAllResource(namespace string) (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseSberCloudExporter) getOBSResourceInfo() (map[string][]string, *[]metrics.Metric) {
+	resourceInfos := map[string][]string{}
+	obsInfo.Lock()
+	defer obsInfo.Unlock()
+	if obsInfo.Info == nil || time.Now().Unix() > obsInfo.TTL {
+		allGroups, err := getAllServer(exporter.ClientConfig)
+		if err != nil {
+			logs.Logger.Errorln("Get all Groups error:", err.Error())
+			return obsInfo.Info, &obsInfo.FilterMetrics
+		}
+		if allGroups == nil {
+			return obsInfo.Info, &obsInfo.FilterMetrics
+		}
+		for _, group := range *allGroups {
+			resourceInfos[group.ID] = []string{group.Name, group.Status}
+		}
+		obsInfo.Info = resourceInfos
+		obsInfo.TTL = time.Now().Add(TTL).Unix()
+	}
+	return obsInfo.Info, &obsInfo.FilterMetrics
+}
+
+func (exporter *BaseSberCloudExporter) getAllResource(namespace string) (map[string][]string, *[]metrics.Metric) {
 	switch namespace {
 	case "SYS.ELB":
 		return exporter.getElbResourceInfo()
@@ -471,6 +495,8 @@ func (exporter *BaseHuaweiCloudExporter) getAllResource(namespace string) (map[s
 		return exporter.getAsResourceInfo()
 	case "SYS.FunctionGraph":
 		return exporter.getFunctionGraphResourceInfo()
+	case "SYS.OBS":
+		return exporter.getOBSResourceInfo()
 	default:
 		return map[string][]string{}, &[]metrics.Metric{}
 	}

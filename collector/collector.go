@@ -40,7 +40,7 @@ var privateResourceFlag = map[string]string{
 	"rds_instance_sqlserver_id": "instance",
 }
 
-type BaseHuaweiCloudExporter struct {
+type BaseSberCloudExporter struct {
 	From            string
 	To              string
 	Namespaces      []string
@@ -59,7 +59,7 @@ func replaceName(name string) string {
 	return newName
 }
 
-func GetMonitoringCollector(configpath string, namespaces []string) (*BaseHuaweiCloudExporter, error) {
+func GetMonitoringCollector(configpath string, namespaces []string) (*BaseSberCloudExporter, error) {
 	globalConfig, err := NewCloudConfigFromFile(configpath)
 	if err != nil {
 		logs.Logger.Fatalln("NewCloudConfigFromFile error: ", err.Error())
@@ -71,7 +71,7 @@ func GetMonitoringCollector(configpath string, namespaces []string) (*BaseHuawei
 		return nil, err
 	}
 
-	exporter := &BaseHuaweiCloudExporter{
+	exporter := &BaseSberCloudExporter{
 		Namespaces:      namespaces,
 		Prefix:          globalConfig.Global.Prefix,
 		MaxRoutines:     globalConfig.Global.MaxRoutines,
@@ -86,11 +86,11 @@ func GetMetricPrefixName(prefix string, namespace string) string {
 }
 
 // Describe simply sends the two Descs in the struct to the channel.
-func (exporter *BaseHuaweiCloudExporter) Describe(ch chan<- *prometheus.Desc) {
+func (exporter *BaseSberCloudExporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- prometheus.NewDesc("dummy", "dummy", nil, nil)
 }
 
-func (exporter *BaseHuaweiCloudExporter) listMetrics(namespace string) ([]metrics.Metric, map[string][]string) {
+func (exporter *BaseSberCloudExporter) listMetrics(namespace string) ([]metrics.Metric, map[string][]string) {
 	allResourcesInfo, metrics := exporter.getAllResource(namespace)
 	logs.Logger.Debugf("[%s] Resource number of %s: %d", exporter.txnKey, namespace, len(allResourcesInfo))
 
@@ -113,7 +113,7 @@ type LabelInfo struct {
 	PreResourceName string
 }
 
-func (exporter *BaseHuaweiCloudExporter) getLabelInfo(allResourcesInfo map[string][]string, metric metricdata.MetricData) *LabelInfo {
+func (exporter *BaseSberCloudExporter) getLabelInfo(allResourcesInfo map[string][]string, metric metricdata.MetricData) *LabelInfo {
 	labels, values, preResourceName, privateFlag := getOriginalLabelInfo(&metric.Dimensions)
 
 	if isResourceExist(&metric.Dimensions, &allResourcesInfo) {
@@ -133,7 +133,7 @@ func (exporter *BaseHuaweiCloudExporter) getLabelInfo(allResourcesInfo map[strin
 	}
 }
 
-func (exporter *BaseHuaweiCloudExporter) setProData(ctx context.Context, ch chan<- prometheus.Metric,
+func (exporter *BaseSberCloudExporter) setProData(ctx context.Context, ch chan<- prometheus.Metric,
 	dataList []metricdata.MetricData, allResourcesInfo map[string][]string) {
 	for _, metric := range dataList {
 		exporter.debugMetricInfo(metric)
@@ -158,7 +158,7 @@ func (exporter *BaseHuaweiCloudExporter) setProData(ctx context.Context, ch chan
 	}
 }
 
-func (exporter *BaseHuaweiCloudExporter) collectMetricByNamespace(ctx context.Context, ch chan<- prometheus.Metric, namespace string) {
+func (exporter *BaseSberCloudExporter) collectMetricByNamespace(ctx context.Context, ch chan<- prometheus.Metric, namespace string) {
 	defer func() {
 		if err := recover(); err != nil {
 			logs.Logger.Fatalln(err)
@@ -204,7 +204,7 @@ func (exporter *BaseHuaweiCloudExporter) collectMetricByNamespace(ctx context.Co
 	logs.Logger.Debugf("[%s] End to scrape all metric data", exporter.txnKey)
 }
 
-func (exporter *BaseHuaweiCloudExporter) Collect(ch chan<- prometheus.Metric) {
+func (exporter *BaseSberCloudExporter) Collect(ch chan<- prometheus.Metric) {
 	duration, err := time.ParseDuration("-10m")
 	if err != nil {
 		logs.Logger.Errorln("ParseDuration -10m error:", err.Error())
@@ -245,7 +245,7 @@ func sendMetricData(ctx context.Context, ch chan<- prometheus.Metric, metric pro
 	return nil
 }
 
-func (exporter *BaseHuaweiCloudExporter) debugMetricInfo(md metricdata.MetricData) {
+func (exporter *BaseSberCloudExporter) debugMetricInfo(md metricdata.MetricData) {
 	dataJson, err := json.Marshal(md)
 	if err != nil {
 		logs.Logger.Errorf("[%s] Marshal metricData error: %s", exporter.txnKey, err.Error())
@@ -307,7 +307,7 @@ func getOriginalLabelInfo(dims *[]metricdata.Dimension) ([]string, []string, str
 	return labels, dimensionValues, preResourceName, privateFlag
 }
 
-func (exporter *BaseHuaweiCloudExporter) getExtensionLabels(
+func (exporter *BaseSberCloudExporter) getExtensionLabels(
 	lables []string, preResourceName string, namespace string, privateFlag string) []string {
 
 	namespace = replaceName(namespace)
@@ -324,7 +324,7 @@ func (exporter *BaseHuaweiCloudExporter) getExtensionLabels(
 	return newlabels
 }
 
-func (exporter *BaseHuaweiCloudExporter) getExtensionLabelValues(
+func (exporter *BaseSberCloudExporter) getExtensionLabelValues(
 	dimensionValues []string,
 	allResourceInfo *map[string][]string,
 	originalID string) []string {

@@ -1,10 +1,10 @@
 # cloudeye-exporter
 
-Prometheus cloudeye exporter for cloudru-advanced.
+Prometheus cloudeye exporter for [Cloud.ru](https://cloud.ru) Advanced.
 
 ## Introduce
 
-Prometheus is an open source visualization tool used to display large-scale measurement data. It also has a broad user base in fields such as industrial monitoring, weather monitoring, home automation, and process management. After connecting the Sbercloud Cloudeye service to prometheus, you can use prometheus to better monitor and analyze data from the Cloudeye service.
+Prometheus is an open source visualization tool used to display large-scale measurement data. It also has a broad user base in fields such as industrial monitoring, weather monitoring, home automation, and process management. After connecting the Cloudeye service to prometheus, you can use prometheus to better monitor and analyze data from the Cloudeye service.
 
 
 ## Install and configure cloudeye-exporter
@@ -79,7 +79,7 @@ scrape_configs:
     params:
       services: ['SYS.VPC,SYS.ELB']
 ```
-3. Start prometheus to monitor cloudru-advanced services
+3. Start prometheus to monitor Cloud.ru Advanced services
 ```
 ./prometheus
 ```

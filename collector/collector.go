@@ -40,7 +40,7 @@ var privateResourceFlag = map[string]string{
 	"rds_instance_sqlserver_id": "instance",
 }
 
-type BaseCloudRuExporter struct {
+type BaseCloudEyeExporter struct {
 	From            string
 	To              string
 	Namespaces      []string
@@ -59,7 +59,7 @@ func replaceName(name string) string {
 	return newName
 }
 
-func GetMonitoringCollector(configpath string, namespaces []string) (*BaseCloudRuExporter, error) {
+func GetMonitoringCollector(configpath string, namespaces []string) (*BaseCloudEyeExporter, error) {
 	globalConfig, err := NewCloudConfigFromFile(configpath)
 	if err != nil {
 		logs.Logger.Fatalln("NewCloudConfigFromFile error: ", err.Error())
@@ -71,7 +71,7 @@ func GetMonitoringCollector(configpath string, namespaces []string) (*BaseCloudR
 		return nil, err
 	}
 
-	exporter := &BaseCloudRuExporter{
+	exporter := &BaseCloudEyeExporter{
 		Namespaces:      namespaces,
 		Prefix:          globalConfig.Global.Prefix,
 		MaxRoutines:     globalConfig.Global.MaxRoutines,
@@ -86,11 +86,11 @@ func GetMetricPrefixName(prefix string, namespace string) string {
 }
 
 // Describe simply sends the two Descs in the struct to the channel.
-func (exporter *BaseCloudRuExporter) Describe(ch chan<- *prometheus.Desc) {
+func (exporter *BaseCloudEyeExporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- prometheus.NewDesc("dummy", "dummy", nil, nil)
 }
 
-func (exporter *BaseCloudRuExporter) listMetrics(namespace string) ([]metrics.Metric, map[string][]string) {
+func (exporter *BaseCloudEyeExporter) listMetrics(namespace string) ([]metrics.Metric, map[string][]string) {
 	allResourcesInfo, metrics := exporter.getAllResource(namespace)
 	logs.Logger.Debugf("[%s] Resource number of %s: %d", exporter.txnKey, namespace, len(allResourcesInfo))
 
@@ -113,7 +113,7 @@ type LabelInfo struct {
 	PreResourceName string
 }
 
-func (exporter *BaseCloudRuExporter) getLabelInfo(allResourcesInfo map[string][]string, metric metricdata.MetricData) *LabelInfo {
+func (exporter *BaseCloudEyeExporter) getLabelInfo(allResourcesInfo map[string][]string, metric metricdata.MetricData) *LabelInfo {
 	labels, values, preResourceName, privateFlag := getOriginalLabelInfo(&metric.Dimensions)
 
 	if isResourceExist(&metric.Dimensions, &allResourcesInfo) {
@@ -133,7 +133,7 @@ func (exporter *BaseCloudRuExporter) getLabelInfo(allResourcesInfo map[string][]
 	}
 }
 
-func (exporter *BaseCloudRuExporter) setProData(ctx context.Context, ch chan<- prometheus.Metric,
+func (exporter *BaseCloudEyeExporter) setProData(ctx context.Context, ch chan<- prometheus.Metric,
 	dataList []metricdata.MetricData, allResourcesInfo map[string][]string) {
 	for _, metric := range dataList {
 		exporter.debugMetricInfo(metric)
@@ -158,7 +158,7 @@ func (exporter *BaseCloudRuExporter) setProData(ctx context.Context, ch chan<- p
 	}
 }
 
-func (exporter *BaseCloudRuExporter) collectMetricByNamespace(ctx context.Context, ch chan<- prometheus.Metric, namespace string) {
+func (exporter *BaseCloudEyeExporter) collectMetricByNamespace(ctx context.Context, ch chan<- prometheus.Metric, namespace string) {
 	defer func() {
 		if err := recover(); err != nil {
 			logs.Logger.Fatalln(err)
@@ -204,7 +204,7 @@ func (exporter *BaseCloudRuExporter) collectMetricByNamespace(ctx context.Contex
 	logs.Logger.Debugf("[%s] End to scrape all metric data", exporter.txnKey)
 }
 
-func (exporter *BaseCloudRuExporter) Collect(ch chan<- prometheus.Metric) {
+func (exporter *BaseCloudEyeExporter) Collect(ch chan<- prometheus.Metric) {
 	duration, err := time.ParseDuration("-10m")
 	if err != nil {
 		logs.Logger.Errorln("ParseDuration -10m error:", err.Error())
@@ -245,7 +245,7 @@ func sendMetricData(ctx context.Context, ch chan<- prometheus.Metric, metric pro
 	return nil
 }
 
-func (exporter *BaseCloudRuExporter) debugMetricInfo(md metricdata.MetricData) {
+func (exporter *BaseCloudEyeExporter) debugMetricInfo(md metricdata.MetricData) {
 	dataJson, err := json.Marshal(md)
 	if err != nil {
 		logs.Logger.Errorf("[%s] Marshal metricData error: %s", exporter.txnKey, err.Error())
@@ -307,7 +307,7 @@ func getOriginalLabelInfo(dims *[]metricdata.Dimension) ([]string, []string, str
 	return labels, dimensionValues, preResourceName, privateFlag
 }
 
-func (exporter *BaseCloudRuExporter) getExtensionLabels(
+func (exporter *BaseCloudEyeExporter) getExtensionLabels(
 	lables []string, preResourceName string, namespace string, privateFlag string) []string {
 
 	namespace = replaceName(namespace)
@@ -324,7 +324,7 @@ func (exporter *BaseCloudRuExporter) getExtensionLabels(
 	return newlabels
 }
 
-func (exporter *BaseCloudRuExporter) getExtensionLabelValues(
+func (exporter *BaseCloudEyeExporter) getExtensionLabelValues(
 	dimensionValues []string,
 	allResourceInfo *map[string][]string,
 	originalID string) []string {

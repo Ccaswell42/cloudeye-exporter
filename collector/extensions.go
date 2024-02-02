@@ -32,7 +32,6 @@ var defaultExtensionLabels = map[string][]string{
 	"sys_ecs":                 []string{"hostname"},
 	"sys_as":                  []string{"name", "status"},
 	"sys_functiongraph":       []string{"func_urn"},
-	"sys_obs":                 []string{"name", "engine_version", "resource_spec_code", "connect_address", "port"},
 }
 
 const TTL = time.Hour * 3
@@ -48,7 +47,6 @@ var (
 	ecsInfo serversInfo
 	asInfo  serversInfo
 	fgsInfo serversInfo
-	obsInfo serversInfo
 )
 
 type serversInfo struct {
@@ -76,7 +74,7 @@ func buildSingleDimensionMetrics(metricNames []string, namespace, dimName, dimVa
 	return filterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getElbResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getElbResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	elbInfo.Lock()
@@ -170,7 +168,7 @@ func buildPoolMetrics(metricNames []string, elb *loadbalancers.LoadBalancer) []m
 	return filterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getNatResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getNatResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	natInfo.Lock()
@@ -202,7 +200,7 @@ func (exporter *BaseCloudRuExporter) getNatResourceInfo() (map[string][]string, 
 	return natInfo.Info, &natInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getRdsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getRdsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	rdsInfo.Lock()
@@ -246,7 +244,7 @@ func (exporter *BaseCloudRuExporter) getRdsResourceInfo() (map[string][]string, 
 	return rdsInfo.Info, &rdsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getDmsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getDmsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	dmsInfo.Lock()
 	defer dmsInfo.Unlock()
@@ -281,7 +279,7 @@ func (exporter *BaseCloudRuExporter) getDmsResourceInfo() (map[string][]string, 
 	return dmsInfo.Info, &dmsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getDcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getDcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := make(map[string][]string)
 	filterMetrics := make([]metrics.Metric, 0)
 	dcsInfo.Lock()
@@ -320,7 +318,7 @@ func (exporter *BaseCloudRuExporter) getDcsResourceInfo() (map[string][]string, 
 	return dcsInfo.Info, &dcsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getVpcResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getVpcResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	vpcInfo.Lock()
 	defer vpcInfo.Unlock()
@@ -352,7 +350,7 @@ func (exporter *BaseCloudRuExporter) getVpcResourceInfo() (map[string][]string, 
 	return vpcInfo.Info, &vpcInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getEvsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getEvsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	evsInfo.Lock()
 	defer evsInfo.Unlock()
@@ -379,7 +377,7 @@ func (exporter *BaseCloudRuExporter) getEvsResourceInfo() (map[string][]string, 
 	return evsInfo.Info, &evsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getEcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getEcsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	ecsInfo.Lock()
 	defer ecsInfo.Unlock()
@@ -403,7 +401,7 @@ func (exporter *BaseCloudRuExporter) getEcsResourceInfo() (map[string][]string, 
 	return ecsInfo.Info, &ecsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getAsResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getAsResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	asInfo.Lock()
 	defer asInfo.Unlock()
@@ -427,7 +425,7 @@ func (exporter *BaseCloudRuExporter) getAsResourceInfo() (map[string][]string, *
 	return asInfo.Info, &asInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getFunctionGraphResourceInfo() (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getFunctionGraphResourceInfo() (map[string][]string, *[]metrics.Metric) {
 	resourceInfos := map[string][]string{}
 	fgsInfo.Lock()
 	defer fgsInfo.Unlock()
@@ -451,29 +449,7 @@ func (exporter *BaseCloudRuExporter) getFunctionGraphResourceInfo() (map[string]
 	return fgsInfo.Info, &fgsInfo.FilterMetrics
 }
 
-func (exporter *BaseCloudRuExporter) getOBSResourceInfo() (map[string][]string, *[]metrics.Metric) {
-	resourceInfos := map[string][]string{}
-	obsInfo.Lock()
-	defer obsInfo.Unlock()
-	if obsInfo.Info == nil || time.Now().Unix() > obsInfo.TTL {
-		allGroups, err := getAllServer(exporter.ClientConfig)
-		if err != nil {
-			logs.Logger.Errorln("Get all Groups error:", err.Error())
-			return obsInfo.Info, &obsInfo.FilterMetrics
-		}
-		if allGroups == nil {
-			return obsInfo.Info, &obsInfo.FilterMetrics
-		}
-		for _, group := range *allGroups {
-			resourceInfos[group.ID] = []string{group.Name, group.Status}
-		}
-		obsInfo.Info = resourceInfos
-		obsInfo.TTL = time.Now().Add(TTL).Unix()
-	}
-	return obsInfo.Info, &obsInfo.FilterMetrics
-}
-
-func (exporter *BaseCloudRuExporter) getAllResource(namespace string) (map[string][]string, *[]metrics.Metric) {
+func (exporter *BaseCloudEyeExporter) getAllResource(namespace string) (map[string][]string, *[]metrics.Metric) {
 	switch namespace {
 	case "SYS.ELB":
 		return exporter.getElbResourceInfo()
@@ -495,8 +471,6 @@ func (exporter *BaseCloudRuExporter) getAllResource(namespace string) (map[strin
 		return exporter.getAsResourceInfo()
 	case "SYS.FunctionGraph":
 		return exporter.getFunctionGraphResourceInfo()
-	case "SYS.OBS":
-		return exporter.getOBSResourceInfo()
 	default:
 		return map[string][]string{}, &[]metrics.Metric{}
 	}

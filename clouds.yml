@@ -1,5 +1,5 @@
 global:
-  prefix: "sbercloud"
+  prefix: "cloud.ru"
   scrape_batch_size: 10
 
 auth:

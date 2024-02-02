@@ -17,7 +17,7 @@ cd cloudeye-exporter
 2. Configure clouds.yml file
 ```
 global:
-  prefix: "sbercloud"
+  prefix: "cloud.ru"
   port: ":8087"
   metric_path: "/metrics"
   scrape_batch_size: 10
@@ -67,13 +67,13 @@ $ cd prometheus-2.14.0.linux-amd64
 ```
 2. Configure access to cloudeye exporter node
 
-   Modify the prometheus.yml file configuration in prometheus. As shown in the following configuration, add a node with job_name named 'sbercloud' under scrape_configs. Among them, targets are configured with the IP address and port number for accessing the cloudeye-exporter service, and services are configured with the services you want to monitor, such as SYS.VPC and SYS.RDS.
+   Modify the prometheus.yml file configuration in prometheus. As shown in the following configuration, add a node with job_name named 'cloud.ru' under scrape_configs. Among them, targets are configured with the IP address and port number for accessing the cloudeye-exporter service, and services are configured with the services you want to monitor, such as SYS.VPC and SYS.RDS.
 ```
 global:
   scrape_interval: 1m # Set the scrape interval to every 1 minute seconds. Default is every 1 minute.
   scrape_timeout: 1m
 scrape_configs:
-  - job_name: 'sbercloud'
+  - job_name: 'cloud.ru'
     static_configs:
     - targets: ['10.0.0.10:8087']
     params:

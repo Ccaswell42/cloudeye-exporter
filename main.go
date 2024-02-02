@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/huaweicloud/cloudeye-exporter/collector"
-	"github.com/huaweicloud/cloudeye-exporter/logs"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/sbercloud-terraform/cloudeye-exporter/collector"
+	"github.com/sbercloud-terraform/cloudeye-exporter/logs"
 )
 
 var (

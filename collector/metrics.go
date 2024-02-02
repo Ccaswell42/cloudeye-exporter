@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"unsafe"
 
-	"github.com/huaweicloud/cloudeye-exporter/logs"
 	"github.com/huaweicloud/golangsdk"
 	"github.com/huaweicloud/golangsdk/openstack"
 	"github.com/huaweicloud/golangsdk/openstack/autoscaling/v1/groups"
@@ -24,6 +23,7 @@ import (
 	rds "github.com/huaweicloud/golangsdk/openstack/rds/v3/instances"
 	"github.com/huaweicloud/golangsdk/openstack/vpc/v1/bandwidths"
 	"github.com/huaweicloud/golangsdk/openstack/vpc/v1/publicips"
+	"github.com/sbercloud-terraform/cloudeye-exporter/logs"
 )
 
 type Config struct {

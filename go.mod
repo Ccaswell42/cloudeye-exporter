@@ -1,4 +1,4 @@
-module github.com/huaweicloud/cloudeye-exporter
+module github.com/sbercloud-terraform/cloudeye-exporter
 
 go 1.14
 

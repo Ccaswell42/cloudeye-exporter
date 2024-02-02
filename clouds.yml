@@ -1,5 +1,5 @@
 global:
-  prefix: "cloud.ru"
+  prefix: "cloudru"
   scrape_batch_size: 10
 
 auth:

@@ -59,7 +59,7 @@ func SetDefaultConfigValues(config *CloudConfig) {
 	}
 
 	if config.Global.Prefix == "" {
-		config.Global.Prefix = "cloud.ru"
+		config.Global.Prefix = "cloudru"
 	}
 
 	if config.Global.MaxRoutines == 0 {

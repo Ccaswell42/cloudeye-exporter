@@ -58,14 +58,8 @@ Usage of ./cloudeye-exporter:
 ```
 The default port is 8087, default config file location is ./clouds.yml.
 
-## Install and configure prometheus to connect to cloudeye
-1. Download Prometheus (https://prometheus.io/download/)
-```
-$ wget https://github.com/prometheus/prometheus/releases/download/v2.14.0/prometheus-2.14.0.linux-amd64.tar.gz 
-$ tar xzf prometheus-2.14.0.linux-amd64.tar.gz
-$ cd prometheus-2.14.0.linux-amd64
-```
-2. Configure access to cloudeye exporter node
+## Configure prometheus to connect to cloudeye
+1. Configure access to cloudeye exporter node
 
    Modify the prometheus.yml file configuration in prometheus. As shown in the following configuration, add a node with job_name named 'cloudru' under scrape_configs. Among them, targets are configured with the IP address and port number for accessing the cloudeye-exporter service, and services are configured with the services you want to monitor, such as SYS.VPC and SYS.RDS.
 ```
@@ -79,7 +73,7 @@ scrape_configs:
     params:
       services: ['SYS.VPC,SYS.ELB']
 ```
-3. Start prometheus to monitor Cloud.ru Advanced services
+2. Start prometheus to monitor Cloud.ru Advanced services
 ```
 ./prometheus
 ```

@@ -32,6 +32,7 @@ var defaultExtensionLabels = map[string][]string{
 	"sys_ecs":                 []string{"hostname"},
 	"sys_as":                  []string{"name", "status"},
 	"sys_functiongraph":       []string{"func_urn"},
+	"sys_obs":                 []string{"name", "engine_version", "resource_spec_code", "connect_address", "port"},
 }
 
 const TTL = time.Hour * 3
@@ -47,6 +48,7 @@ var (
 	ecsInfo serversInfo
 	asInfo  serversInfo
 	fgsInfo serversInfo
+	obsInfo serversInfo
 )
 
 type serversInfo struct {
@@ -449,6 +451,28 @@ func (exporter *BaseCloudEyeExporter) getFunctionGraphResourceInfo() (map[string
 	return fgsInfo.Info, &fgsInfo.FilterMetrics
 }
 
+func (exporter *BaseCloudEyeExporter) getOBSResourceInfo() (map[string][]string, *[]metrics.Metric) {
+	resourceInfos := map[string][]string{}
+	obsInfo.Lock()
+	defer obsInfo.Unlock()
+	if obsInfo.Info == nil || time.Now().Unix() > obsInfo.TTL {
+		allGroups, err := getAllServer(exporter.ClientConfig)
+		if err != nil {
+			logs.Logger.Errorln("Get all Groups error:", err.Error())
+			return obsInfo.Info, &obsInfo.FilterMetrics
+		}
+		if allGroups == nil {
+			return obsInfo.Info, &obsInfo.FilterMetrics
+		}
+		for _, group := range *allGroups {
+			resourceInfos[group.ID] = []string{group.Name, group.Status}
+		}
+		obsInfo.Info = resourceInfos
+		obsInfo.TTL = time.Now().Add(TTL).Unix()
+	}
+	return obsInfo.Info, &obsInfo.FilterMetrics
+}
+
 func (exporter *BaseCloudEyeExporter) getAllResource(namespace string) (map[string][]string, *[]metrics.Metric) {
 	switch namespace {
 	case "SYS.ELB":
@@ -471,6 +495,8 @@ func (exporter *BaseCloudEyeExporter) getAllResource(namespace string) (map[stri
 		return exporter.getAsResourceInfo()
 	case "SYS.FunctionGraph":
 		return exporter.getFunctionGraphResourceInfo()
+	case "SYS.OBS":
+		return exporter.getOBSResourceInfo()
 	default:
 		return map[string][]string{}, &[]metrics.Metric{}
 	}
